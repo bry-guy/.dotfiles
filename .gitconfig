@@ -1,0 +1,12 @@
+[credential]
+	helper = cache --timeout=360000
+[alias]
+	co = checkout
+	br = branch
+	st = status
+	last = log -1 HEAD
+[user]
+	name = Bryan Smith
+	email = bryanj.smith91@gmail.com
+[core]
+	editor = vim
