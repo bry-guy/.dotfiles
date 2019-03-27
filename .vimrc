@@ -1,4 +1,3 @@
-execute pathogen#infect()
 syntax on
 filetype plugin indent on
 let g:typescript_indent_disable = 0
