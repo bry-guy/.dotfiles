@@ -129,6 +129,10 @@ export VISUAL=/usr/bin/vim
 #nvm
 export NVM_DIR=~/.nvm
 source $(brew --prefix nvm)/nvm.sh
+export NODE_PATH=`which node`
+
+#android
+export ANDROID_HOME=/Users/smith.bryan/Library/Android/sdk
 
 #alias git to g with autocomplete enabled
 alias g='git'
@@ -142,6 +146,9 @@ fi
 
 #aws
 export PATH="~/Library/Python/3.7/bin:$PATH"
+
+#factorio
+export PATH="~/Library/Application Support/Steam/steamapps/common/Factorio/factorio.app/Contents/MacOS:$PATH"
 
 # tabtab source for serverless package
 # uninstall by removing these lines or running `tabtab uninstall serverless`
@@ -169,10 +176,42 @@ if [ -d ${SRC_PATH} ]; then
 fi
 alias nuget="mono /usr/local/bin/nuget.exe"
 
+# force new line
+###
+# Configure PS1 by using the old value but ensuring it starts on a new line.
+###
+__configure_prompt() {
+  PS1=""
 
-# functions
-function ccd() {
-    local default_repo="$HOME/code/appcenter"
-    local rootdir=$(git rev-parse --show-toplevel 2> /dev/null || echo "$default_repo")
-    cd "$rootdir"
+  if [ "$(__get_terminal_column)" != 0 ]; then
+    PS1="\n"
+  fi
+
+  PS1+="$PS1_WITHOUT_PREPENDED_NEWLINE"
 }
+
+###
+# Get the current terminal column value.
+#
+# From https://stackoverflow.com/a/2575525/549363.
+###
+__get_terminal_column() {
+  exec < /dev/tty
+  local oldstty=$(stty -g)
+  stty raw -echo min 0
+  echo -en "\033[6n" > /dev/tty
+  local pos
+  IFS=';' read -r -d R -a pos
+  stty $oldstty
+  echo "$((${pos[1]} - 1))"
+}
+
+# Save the current PS1 for later.
+PS1_WITHOUT_PREPENDED_NEWLINE="$PS1"
+
+# Use our prompt configuration function, preserving whatever existing
+# PROMPT_COMMAND might be configured.
+PROMPT_COMMAND="__configure_prompt;$PROMPT_COMMAND"
+
+# did
+alias did="vim +'normal Go' +'r!date' ~/did.txt"
