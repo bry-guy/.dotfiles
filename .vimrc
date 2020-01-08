@@ -11,3 +11,6 @@ set clipboard=unnamed
 set nocompatible
 filetype plugin on
 syntax on
+
+highlight ColorColumn ctermbg=magenta
+call matchadd('ColorColumn', '\%121v', 100)
