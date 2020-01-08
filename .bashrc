@@ -214,4 +214,4 @@ PS1_WITHOUT_PREPENDED_NEWLINE="$PS1"
 PROMPT_COMMAND="__configure_prompt;$PROMPT_COMMAND"
 
 # did
-alias did="vim +'normal Go' +'r!date' ~/did.txt"
+alias did="vim +'normal Go' +'r!date' ~/vimwiki/did.wiki"
