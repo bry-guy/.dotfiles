@@ -1,16 +1,7 @@
-syntax on
-filetype plugin indent on
-let g:typescript_indent_disable = 0
+"# Set the background theme to dark
+set background = "dark"
 
-set nu 
-colorscheme desert
-set tabstop=8 softtabstop=0 expandtab shiftwidth=4 smarttab
-set autoindent
-set clipboard=unnamed
+"# Don't forget set the airline theme as well.
+let g:airline_theme = "one"
 
-set nocompatible
-filetype plugin on
-syntax on
-
-highlight ColorColumn ctermbg=magenta
-call matchadd('ColorColumn', '\%121v', 100)
+set termguicolors

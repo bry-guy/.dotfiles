@@ -77,25 +77,9 @@ esac
 if [ -x /usr/bin/dircolors ]; then
     test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
     alias ls='ls --color=auto'
-    #alias dir='dir --color=auto'
-    #alias vdir='vdir --color=auto'
 
     alias grep='grep --color=auto'
-    alias fgrep='fgrep --color=auto'
-    alias egrep='egrep --color=auto'
 fi
-
-# colored GCC warnings and errors
-#export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
-
-# some more ls aliases
-alias ll='ls -alF'
-alias la='ls -A'
-alias l='ls -CF'
-
-# Add an "alert" alias for long running commands.  Use like so:
-#   sleep 10; alert
-alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 
 # Alias definitions.
 # You may want to put all your additions into a separate file like
@@ -123,8 +107,8 @@ export PATH="/usr/local/share/dotnet:$PATH"
 export PATH="/Library/Frameworks/Mono.framework/Versions/Current/Commands:$PATH"
 
 #vim >> vi
-export EDITOR=/usr/bin/vim
-export VISUAL=/usr/bin/vim
+export EDITOR=/usr/bin/nvim
+export VISUAL=/usr/bin/nvim
 
 #nvm
 export NVM_DIR=~/.nvm
@@ -150,52 +134,31 @@ export PATH="~/Library/Python/3.7/bin:$PATH"
 #factorio
 export PATH="~/Library/Application Support/Steam/steamapps/common/Factorio/factorio.app/Contents/MacOS:$PATH"
 
-# tabtab source for serverless package
-# uninstall by removing these lines or running `tabtab uninstall serverless`
-[ -f /Users/smith.bryan/.nvm/versions/node/v8.2.1/lib/node_modules/serverless/node_modules/tabtab/.completions/serverless.bash ] && . /Users/smith.bryan/.nvm/versions/node/v8.2.1/lib/node_modules/serverless/node_modules/tabtab/.completions/serverless.bash
-# tabtab source for sls package
-# uninstall by removing these lines or running `tabtab uninstall sls`
-[ -f /Users/smith.bryan/.nvm/versions/node/v8.2.1/lib/node_modules/serverless/node_modules/tabtab/.completions/sls.bash ] && . /Users/smith.bryan/.nvm/versions/node/v8.2.1/lib/node_modules/serverless/node_modules/tabtab/.completions/sls.bash
+#azcopy
+export PATH="/usr/local/bin/azcopy:$PATH"
 
 # WORK STUFF ONLY HERE
-SRC_PATH=${HOME}/Code/appcenter/dockercompose
-if [ -d ${SRC_PATH} ]; then
- declare -a arr=("build" "restart" "integration" "logs" "ps" "reset" "stop" "tests" "here" "clean")
- for cmd in "${arr[@]}"
- do
-   eval "c${cmd}() { ${SRC_PATH}/${cmd}.ps1 crashes-docker \$*; }"
- done
-fi
-
-if [ -d ${SRC_PATH} ]; then
- declare -a arr=("build" "restart" "integration" "logs" "ps" "reset" "stop" "tests" "here" "clean")
- for cmd in "${arr[@]}"
- do
-   eval "di${cmd}() { ${SRC_PATH}/${cmd}.ps1 diagnostics/docker \$*; }"
- done
-fi
 alias nuget="mono /usr/local/bin/nuget.exe"
 
 # force new line
 ###
 # Configure PS1 by using the old value but ensuring it starts on a new line.
 ###
-__configure_prompt() {
-  PS1=""
+ __configure_prompt() {
+   PS1=""
+ 
+   if [ "$(__get_terminal_column)" != 0 ]; then
+     PS1="\n"
+   fi
 
-  if [ "$(__get_terminal_column)" != 0 ]; then
-    PS1="\n"
-  fi
+   PS1+="$PS1_WITHOUT_PREPENDED_NEWLINE"
+ }
 
-  PS1+="$PS1_WITHOUT_PREPENDED_NEWLINE"
-}
-
-###
 # Get the current terminal column value.
 #
 # From https://stackoverflow.com/a/2575525/549363.
-###
-__get_terminal_column() {
+#
+ __get_terminal_column() {
   exec < /dev/tty
   local oldstty=$(stty -g)
   stty raw -echo min 0
@@ -214,4 +177,111 @@ PS1_WITHOUT_PREPENDED_NEWLINE="$PS1"
 PROMPT_COMMAND="__configure_prompt;$PROMPT_COMMAND"
 
 # did
-alias did="echo '' >> ~/vimwiki/did.wiki && vim -c ':$' +'r!date' /Users/smith.bryan/vimwiki/did.wiki"
+alias did="echo '' >> ~/vimwiki/did.md && vim -c ':$' +'r!date' /Users/smith.bryan/vimwiki/did.md"
+
+# neovim
+alias vim=nvim
+alias vimplugins="vim /Users/smith.bryan/.config/nvim/init.vim"
+
+# fzf
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+export FZF_DEFAULT_COMMAND='rg --files --no-ignore-vcs --hidden'
+
+## find in file
+fif() {
+  if [ ! "$#" -gt 0 ]; then echo "Need a string to search for!"; return 1; fi
+  rg --files-with-matches --no-messages "$1" | fzf --preview "highlight -O ansi -l {} 2> /dev/null | rg --colors 'match:bg:yellow' --ignore-case --pretty --context 10 '$1' || rg --ignore-case --pretty --context 10 '$1' {}"
+}
+
+## kill process
+fkill() {
+  local pid
+  pid=$(ps -ef | sed 1d | fzf -m | awk '{print $2}')
+
+  if [ "x$pid" != "x" ]
+  then
+    echo $pid | xargs kill -${1:-9}
+  fi
+}
+
+## find directory
+fd() {
+  local dir
+  dir=$(find ${1:-.} -path '*/\.*' -prune \
+                  -o -type d -print 2> /dev/null | fzf +m) &&
+  cd "$dir"
+}
+
+## find all directories
+fda() {
+  local dir
+  dir=$(find ${1:-.} -type d 2> /dev/null | fzf +m) && cd "$dir"
+}
+
+## cd to selected parent directory
+fdp() {
+  local declare dirs=()
+  get_parent_dirs() {
+    if [[ -d "${1}" ]]; then dirs+=("$1"); else return; fi
+    if [[ "${1}" == '/' ]]; then
+      for _dir in "${dirs[@]}"; do echo $_dir; done
+    else
+      get_parent_dirs $(dirname "$1")
+    fi
+  }
+  local DIR=$(get_parent_dirs $(realpath "${1:-$PWD}") | fzf-tmux --tac)
+  cd "$DIR"
+}
+
+# cdf - cd into the directory of the selected file
+cdf() {
+   local file
+   local dir
+   file=$(fzf +m -q "$1") && dir=$(dirname "$file") && cd "$dir"
+}
+
+# Install or open the webpage for the selected application 
+# using brew cask search as input source
+# and display a info quickview window for the currently marked application
+install() {
+    local token
+    token=$(brew search --casks | fzf-tmux --query="$1" +m --preview 'brew cask info {}')
+
+    if [ "x$token" != "x" ]
+    then
+        echo "(I)nstall or open the (h)omepage of $token"
+        read input
+        if [ $input = "i" ] || [ $input = "I" ]; then
+            brew cask install $token
+        fi
+        if [ $input = "h" ] || [ $input = "H" ]; then
+            brew cask home $token
+        fi
+    fi
+}
+
+# Uninstall or open the webpage for the selected application 
+# using brew list as input source (all brew cask installed applications) 
+# and display a info quickview window for the currently marked application
+uninstall() {
+    local token
+    token=$(brew cask list | fzf-tmux --query="$1" +m --preview 'brew cask info {}')
+
+    if [ "x$token" != "x" ]
+    then
+        echo "(U)ninstall or open the (h)omepage of $token"
+        read input
+        if [ $input = "u" ] || [ $input = "U" ]; then
+            brew cask uninstall $token
+        fi
+        if [ $input = "h" ] || [ $token = "h" ]; then
+            brew cask home $token
+        fi
+    fi
+}
+
+# ripgrep
+alias grep=rg
+
+# notes
+alias notes='vim /Users/smith.bryan/journal/Notes/notes.md'
