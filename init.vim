@@ -11,6 +11,8 @@ Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
 Plug '~/.fzf'
+Plug 'vim-ruby/vim-ruby'
+Plug 'sbdchd/neoformat'
 call plug#end()
 
 "" filetype settings
@@ -18,7 +20,6 @@ filetype on
 filetype plugin on
 
 autocmd FileType json setlocal shiftwidth=2 tabstop=2 softtabstop=2
-
 
 "" nvim settings
 set relativenumber
@@ -30,6 +31,10 @@ set completeopt-=preview
 set hidden
 set ignorecase
 set smartcase
+
+""" tab settings
+set splitbelow
+set splitright
 
 "" theming
 if (has("termguicolors"))
@@ -58,8 +63,24 @@ end
 require'nvim_lsp'.bashls.setup{on_attach=on_attach_vim}
 require'nvim_lsp'.jsonls.setup{on_attach=on_attach_vim}
 require'nvim_lsp'.tsserver.setup{on_attach=on_attach_vim}
+require'nvim_lsp'.solargraph.setup{on_attach=on_attach_vim}
 
 EOF
+
+""" omnifunc
+autocmd BufNewFile,BufRead *.tsx setlocal filetype=typescript.tsx " magic that makes tsx files work!
+
+autocmd Filetype typescript setlocal omnifunc=v:lua.vim.lsp.omnifunc
+autocmd Filetype typescriptreact setlocal omnifunc=v:lua.vim.lsp.omnifunc
+autocmd Filetype typescript.tsx setlocal omnifunc=v:lua.vim.lsp.omnifunc
+autocmd Filetype ruby setlocal omnifunc=v:lua.vim.lsp.omnifunc
+
+"autocmd Filetype ruby setlocal omnifunc=vim-ruby
+"let g:rubycomplete_buffer_loading = 1
+"let g:rubycomplete_classes_in_global = 1
+"let g:rubycomplete_rails = 1
+
+autocmd CompleteDone * pclose
 
 """ lsp settings
 nnoremap <silent> gd	<cmd>lua vim.lsp.buf.definition()<CR>
@@ -119,8 +140,4 @@ function! PreventBuffersInNERDTree()
 endfunction
 
 " switch to previous buffer then delete the new-previous buffer
-nnoremap \d :bp<cr>:bd #<cr>
-
-""" omnifunc
-autocmd Filetype typescript setlocal omnifunc=v:lua.vim.lsp.omnifunc
-autocmd CompleteDone * pclose
+nnoremap \x :bp<cr>:bd #<cr>

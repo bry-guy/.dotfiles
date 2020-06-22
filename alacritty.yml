@@ -4,22 +4,22 @@ window:
 
 dynamic_title: true
 
-font:
-  size: 11
-  normal:
-    family: Hack Nerd Font Mono
-    style: Regular
-
-  bold:
-    family: Hack Nerd Font Mono
-    style: Bold
-
-  italic:
-    family: Hack Nerd Font Mono
-    style: Italic
+#font:
+#size: 11
+  #  normal:
+  #    family: Hack Nerd Font Mono
+  #    style: Regular
+  #
+  #  bold:
+  #    family: Hack Nerd Font Mono
+  #    style: Bold
+  #
+  #  italic:
+  #    family: Hack Nerd Font Mono
+  #    style: Italic
 
 # Opacity
-background_opacity: 0.9
+# background_opacity: 0.9
 
 # Colors (Monokai Dark)
 colors:

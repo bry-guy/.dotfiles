@@ -107,8 +107,8 @@ export PATH="/usr/local/share/dotnet:$PATH"
 export PATH="/Library/Frameworks/Mono.framework/Versions/Current/Commands:$PATH"
 
 #vim >> vi
-export EDITOR=/usr/bin/nvim
-export VISUAL=/usr/bin/nvim
+export EDITOR=/usr/bin/vim
+export VISUAL=/usr/bin/vim
 
 #nvm
 export NVM_DIR=~/.nvm
@@ -285,3 +285,43 @@ alias grep=rg
 
 # notes
 alias notes='vim /Users/smith.bryan/journal/Notes/notes.md'
+
+# az
+alias az-int="az account set -s 605e20ca-dc11-4d58-a0c0-88e996c8954e"
+alias az-prod="az account set -s 9c2ed2f1-640d-41b1-acf7-4c750f9c97f1"
+alias az-prod-2="az account set -s 93d90205-1541-4c9e-8e83-ce02123bd11e"
+alias az-prod-codepush="az account set -s 4bf04ea6-eb29-474d-ad66-4e8efc9fd384"
+
+# k8s
+alias k="kubectl"
+PROMPT=$PROMPT'$(kube_ps1) '
+alias k-core-int="kubectl config use-context core-integration"
+alias k-dist-int="kubectl config use-context distribution-integration"
+alias k-diag-search-int="kubectl config use-context diag-search-integration"
+alias k-diag-int="kubectl config use-context diagnostics-integration"
+alias k-onees-int="kubectl config use-context onees-int-disco-east-us"
+alias k-core-prod="kubectl config use-context core-prod-east-us2"
+alias k-core2-prod="kubectl config use-context core2-prod-east-us"
+alias k-dist-prod="kubectl config use-context distribution-prod-east-us2-distrib"
+alias k-diag-prod="kubectl config use-context diagnostics-prod-east-us2"
+alias k-diag-apple-prod="kubectl config use-context diag-apple-prod-east-us2"
+alias k-diag2-apple-prod="kubectl config use-context diag2-apple-prod-east-us-diag"
+alias k-diag-search-prod="kubectl config use-context diag-search-prod-east-us2"
+alias k-codepush-prod="kubectl config use-context codepush-prod-east-us2-codepush"
+alias k-dashboard="~/appcenter/deployment/deployment/Scripts/Bash/open-kubernetes.sh"
+
+# c++
+export PATH="/usr/local/opt/llvm/bin:$PATH"
+export LDFLAGS="-L/usr/local/opt/llvm/lib"
+export CPPFLAGS="-I/usr/local/opt/llvm/include"
+export CPPUTEST_HOME="/usr/local/Cellar/cpputest/3.8"
+
+export PATH="/usr/local/opt/openss/bin:$PATH"
+
+# show and switch to branches interactively
+function b() {
+  local branches branch
+  branches=$(git --no-pager branch -vv) &&
+  branch=$(echo "$branches" | fzf +m --layout=reverse) &&
+  git checkout $(echo "$branch" | awk '{print $1}' | sed "s/.* //")
+}
